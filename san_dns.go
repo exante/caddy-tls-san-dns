@@ -18,7 +18,7 @@ type Verifier struct {
 
 func (Verifier) CaddyModule() caddy.ModuleInfo {
 	return caddy.ModuleInfo{
-		ID:  "tls.client_auth.san_dns",
+		ID:  "tls.client_auth.verifier.san_dns",
 		New: func() caddy.Module { return new(Verifier) },
 	}
 }
