@@ -6,7 +6,11 @@ If a name starts and ends with a slash, it's treated as a go's RE2 regexp. Be ca
 more than you should. Otherwise, if it contains an astrisk, it's treated as a hostname wildcard. Otherwise,
 it has to match exactly.
 
+You may want to control the trusted CA list explicitly to reduce the risk of accepting a client with a certificate
+that has been obtained under circumstances you wouldn't necessarily deem ideal.
+
 Here's the sample config (only relevant parts):
+
 ```json
 {
   "apps": {
@@ -28,9 +32,10 @@ Here's the sample config (only relevant parts):
                             "names": [
                               "hostname.domain.tld",
                               "*.example.com",
-                              "/^container-.*\.localhost$/"
+                              "/^container-.*\\.localhost$/"
                             ]
 ```
+
 It should work the same without L4, as connection policies are a part of the caddy itself, not L4 module.
 
-Disclaimer: the code was simple enough to hack together, and it works for us so far, but in no way I'm an expert in go.
+Disclaimer: the code was simple enough to hack together, and it works for me so far, but in no way I'm an expert in go.
