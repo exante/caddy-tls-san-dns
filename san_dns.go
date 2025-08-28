@@ -9,6 +9,7 @@ import (
 	"github.com/caddyserver/caddy/v2"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"github.com/caddyserver/caddy/v2/caddyconfig/caddyfile"
 )
 
 func init() {
@@ -87,3 +88,37 @@ func (v Verifier) VerifyClientCertificate(rawCerts [][]byte, _ [][]*x509.Certifi
 
 	return fmt.Errorf("SAN DNS: no match for names: %v", found.DNSNames)
 }
+
+func parseConfigEntryFromCaddyfile(d *caddyfile.Dispenser, key string, v *Verifier) (error, bool) {
+	switch key {
+	case "names":
+		if !d.NextArg() {
+			return d.ArgErr(), true
+		}
+		v.Names = d.RemainingArgs()
+
+	default:
+		return d.Errf("unknown subdirective for the san_dns verifier: %s", key), true
+	}
+
+	return nil, false
+}
+
+// UnmarshalCaddyfile implements caddyfile.Unmarshaler.
+func (v *Verifier) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
+	for d.Next() {
+		for nesting := d.Nesting(); d.NextBlock(nesting); {
+			key := d.Val()
+			err, done := parseConfigEntryFromCaddyfile(d, key, v)
+			if done {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+var (
+	_ caddy.Provisioner           = (*Verifier)(nil)
+	_ caddyfile.Unmarshaler       = (*Verifier)(nil)
+)

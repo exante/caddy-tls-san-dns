@@ -36,6 +36,21 @@ Here's the sample config (only relevant parts):
                             ]
 ```
 
+And as Caddyfile configuration
+```
+tls {
+    trust_pool http {
+        endpoints https://some.endpoint.tld:443/root.pem
+    }
+    client_auth {
+        mode require_and_verify
+        verifier san_dns {
+            names [ "hostname.domain.tld", "*.example.com", "/^container-.*\\.localhost$/" ]
+        }
+    }
+}
+```
+
 It should work the same without L4, as connection policies are a part of the caddy itself, not L4 module.
 
 Disclaimer: the code was simple enough to hack together, and it works for me so far, but in no way I'm an expert in go.
